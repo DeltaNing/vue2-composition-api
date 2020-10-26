@@ -35,6 +35,9 @@ export default {
   name: 'HelloWorld',
   props: {
     msg: String
+  },
+  setup(props, context) {
+    console.log(props, context)
   }
 }
 </script>
