@@ -12,3 +12,14 @@ export function fetch() {
 export function generateId() {
     return Date.now() + Math.random().toString(16).substr(2, 4)
 }
+
+export function filter(todos, filterWord) {
+    if (filterWord === 'all') {
+        return todos
+    } else if (filterWord === 'active') {
+        return todos.filter(item => !item.completed)
+    } else if (filterWord === 'completed') {
+        return todos.filter(item => item.completed)
+    }
+    throw new Error("invalid filter word");
+}

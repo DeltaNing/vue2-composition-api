@@ -13,30 +13,14 @@
         />
       </header>
       <section class="main">
-        <input id="toggle-all" class="toggle-all" type="checkbox" />
+        <input v-model="allDoneRef" id="toggle-all" class="toggle-all" type="checkbox" />
         <label for="toggle-all">Mark all as complete</label>
         <ul class="todo-list">
-          <li class="todo" v-for="item in todoListRef" :key="item.id">
+          <li class="todo" v-for="item in filterTodoRef" :key="item.id" :class="{completed: item.completed}">
             <div class="view">
-              <input class="toggle" type="checkbox" />
+              <input v-model="item.completed" class="toggle" type="checkbox" />
               <label>{{ item.title }}</label>
-              <button class="destroy"></button>
-            </div>
-            <input class="edit" type="text" />
-          </li>
-          <li class="todo">
-            <div class="view">
-              <input class="toggle" type="checkbox" />
-              <label>投递50封简历</label>
-              <button class="destroy"></button>
-            </div>
-            <input class="edit" type="text" />
-          </li>
-          <li class="todo">
-            <div class="view">
-              <input class="toggle" type="checkbox" />
-              <label>上午10:30 参加面试</label>
-              <button class="destroy"></button>
+              <button class="destroy" @click="removeTodo(item)"></button>
             </div>
             <input class="edit" type="text" />
           </li>
@@ -44,15 +28,15 @@
       </section>
       <footer class="footer">
         <span class="todo-count">
-          <strong>3</strong>
+          <strong>{{ remainingRef }}</strong>
           <span>items left</span>
         </span>
         <ul class="filters">
-          <li><a href="#/all" class="selected">All</a></li>
-          <li><a href="#/active" class="">Active</a></li>
-          <li><a href="#/completed" class="">Completed</a></li>
+          <li><a :class="{selected: filterWordRef === 'all'}" @click="filterWordRef = 'all'">All</a></li>
+          <li><a :class="{selected: filterWordRef === 'active'}" @click="filterWordRef = 'active'">Active</a></li>
+          <li><a :class="{selected: filterWordRef === 'completed'}" @click="filterWordRef = 'completed'">Completed</a></li>
         </ul>
-        <button class="clear-completed" style="display: none">
+        <button class="clear-completed" v-show="completedRef" @click="removeCompleted">
           Clear completed
         </button>
       </footer>
@@ -64,6 +48,9 @@
 import { ref, watchEffect } from '@vue/composition-api'
 import * as todoStorage from '../utils/storeTodos'
 import newTodo from "@/composition/useNewTodo";
+import useFilter from "@/composition/useFilter";
+import useRemoveTodo from "@/composition/useRemoveTodo";
+import useEditTodo from "@/composition/useEditTodo";
 
 export default {
   setup() {
@@ -78,7 +65,9 @@ export default {
 
     return {
       ...newTodo(todoListRef),
-      todoListRef
+      ...useFilter(todoListRef),
+      ...useRemoveTodo(todoListRef),
+      ...useEditTodo(todoListRef),
     };
   },
 };
